@@ -1,0 +1,4 @@
+soundfile
+requests
+boto3
+numpy

@@ -12,8 +12,24 @@ hf-kws/
 │   ├── stream_infer.py
 │   ├── evaluate.py
 │   └── export_onnx.py
-└── configs/
-    └── train_config.yaml
+├── configs/
+│   └── train_config.yaml
+├── sagemaker/
+│   ├── launch_training.py
+│   ├── deploy_realtime.py
+│   ├── deploy_serverless.py
+│   ├── batch_transform.py
+│   ├── pipeline.py
+│   └── code/
+│       ├── inference.py
+│       └── requirements.txt
+├── client/
+│   ├── invoke_realtime.py
+│   └── sample.jsonl
+├── .github/workflows/ci.yml
+├── Makefile
+├── requirements.txt              
+└── README_SageMaker.md
 ```
 This project fine-tunes a Wav2Vec2 audio classifier for **keyword spotting** on the
 open-source **Speech Commands v2** dataset, then runs both offline and realtime streaming inference.

@@ -1,0 +1,39 @@
+name: ci
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.10' }
+      - run: pip install -r requirements.txt
+      - run: pip install ruff pytest
+      - run: ruff check .
+      - run: pytest -q
+
+  # Optional: kick off SageMaker Pipeline on main
+  pipeline:
+    if: github.ref == 'refs/heads/main' && vars.AWS_ROLE_TO_ASSUME
+    needs: [test]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.10' }
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.AWS_ROLE_TO_ASSUME }}
+          aws-region: ${{ vars.AWS_REGION || 'us-east-1' }}
+      - run: pip install sagemaker boto3
+      - name: Upsert pipeline
+        run: python sagemaker/pipeline.py

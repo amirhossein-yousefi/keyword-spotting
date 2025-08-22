@@ -1,0 +1,43 @@
+seed: 42
+
+# Model (any HF audio-classification checkpoint will work)
+model_name_or_path: "facebook/wav2vec2-base"
+
+# Data
+dataset_name: "speech_commands"
+dataset_config: "v0.02"       # HF datasets config
+sample_rate: 16000
+max_duration_seconds: 1.0      # target window per example
+subset_fraction: 1.0           # 1.0 = full dataset; <1.0 subsamples for quick runs
+
+# Training
+num_train_epochs: 10
+learning_rate: 1.0e-4
+weight_decay: 0.01
+warmup_ratio: 0.1
+lr_scheduler_type: "cosine"
+train_batch_size: 24
+eval_batch_size: 32
+gradient_accumulation_steps: 1
+fp16: true
+logging_steps: 50
+eval_steps: 5000
+save_steps: 5000
+save_total_limit: 2
+evaluation_strategy: "steps"
+load_best_model_at_end: true
+metric_for_best_model: "accuracy"
+greater_is_better: true
+max_grad_norm: 1.0
+
+# Augmentations (applied on-the-fly to training split only)
+augment:
+  enabled: true
+  time_shift_ms: 100        # +/- 100ms
+  noise_snr_db_min: 10      # lower SNR (more noise)
+  noise_snr_db_max: 30
+  random_gain_db: 6         # +/- 6 dB
+
+# Misc
+push_to_hub: false
+hub_model_id: null

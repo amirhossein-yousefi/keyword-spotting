@@ -114,3 +114,72 @@ python -m src.infer \
 ```bash
 python -m src.evaluate_fn --model_dir ./checkpoints/kws_w2v2
 ```
+
+
+## AWS SageMaker — Train, Deploy, Batch
+
+> This repository includes a minimal but complete SageMaker setup (scripts + client + CI).
+
+### Prerequisites
+- AWS account + `sagemaker` and `ecr` permissions.
+- Set `AWS_REGION` and (if using GitHub Actions) `AWS_ROLE_TO_ASSUME` as repository variables/secrets.
+
+### Quick commands (via `Makefile`)
+```bash
+# 1) Launch a training job
+make train
+
+# 2) Deploy a realtime endpoint
+make deploy
+# or deploy Serverless Inference
+make deploy-sls
+
+# 3) Run a Batch Transform job over a JSONL manifest in S3
+make batch
+
+# 4) Tear down the endpoint
+make delete
+```
+
+### What the scripts do
+- **`sagemaker/launch_training.py`** – spins up a Hugging Face training job. Region defaults to your session (`boto3.Session().region_name` or `us-east-1`). 
+- **`sagemaker/deploy_realtime.py`** – creates a Hugging Face model and deploys a realtime endpoint; supports **Serverless Inference** when `SERVERLESS=true`.
+- **`sagemaker/batch_transform.py`** – runs offline inference using a JSONL manifest in S3. Set env vars (examples):  
+  `MODEL_S3` (model tarball), `INPUT_JSONL_S3` (JSONL path), `OUTPUT_S3` (optional), `BT_INSTANCES`, `BT_INSTANCE_TYPE`.  
+  Each JSONL line looks like:  
+  ```json
+  {"inputs": {"s3_uri": "s3://bucket/key.wav"}, "parameters": {"top_k": 5}}
+  ```
+- **`sagemaker/code/inference.py`** – custom entrypoint for Hugging Face Inference Toolkit. **Accepted inputs** (any of):  
+  - `{"inputs": {"base64": "<...>"}}` (WAV bytes)  
+  - `{"inputs": {"s3_uri": "s3://..."}}`  
+  - `{"inputs": {"url": "https://..."}}`  
+  - `{"inputs": {"array": [...], "sampling_rate": 16000}}`  
+  Returns top‑K labels/scores.
+- **`client/invoke_realtime.py`** – tiny invoker:  
+  ```bash
+  AWS_REGION=us-east-1 ENDPOINT_NAME=kws-realtime WAV_PATH=sample.wav TOP_K=5   python client/invoke_realtime.py
+  ```
+
+### CI (GitHub Actions)
+- Workflow: `.github/workflows/ci.yml` → checkout → set up Python 3.10 → install `requirements.txt` → run `ruff` and `pytest`.  
+  On `main`, if `AWS_ROLE_TO_ASSUME` is set, it **configures AWS creds** and runs `python sagemaker/pipeline.py`.
+
+---
+
+## Tips & Troubleshooting
+- Use `-h` on any script (e.g., `python -m src.train -h`) to see all flags.
+- If you previously saw `requireeements.txt`, note it’s been **renamed** to `requirements.txt`.
+- For realtime inference audio I/O issues, check microphone permissions and default input device.
+- If CUDA mismatches occur, verify your driver/runtime pairing (example run used CUDA 12.9 with PyTorch 2.8.0+cu129).
+
+---
+
+## Roadmap
+- Confusion matrix and per‑class metrics visualization.
+- More keyword sets and multilingual support.
+- Quantization / distillation + mobile demo (TFLite/CoreML).
+
+## Acknowledgements
+- Hugging Face `transformers` and `datasets`
+- Google **Speech Commands** dataset

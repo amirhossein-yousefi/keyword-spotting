@@ -44,7 +44,48 @@ python -m src.train \
   --per_device_eval_batch_size 16
 
 ```
+**Download** the finetuned weights with bellow hyperparameter from [here](https://drive.google.com/file/d/1Fi0re7HHcYu83alKxYUgk2zMMUSgaLiN/view?usp=sharing)
 
+## 🚀 Training Command
+
+To reproduce the default training run:
+
+```bash
+python train.py \
+```
+By default, the script uses the speech_commands dataset.
+
+
+## 🖥️ Training Hardware & Environment
+
+- **Device:** Laptop (Windows, WDDM driver model)
+- **GPU:** NVIDIA GeForce **RTX 3080 Ti Laptop GPU** (16 GB VRAM)
+- **Driver:** **576.52**
+- **CUDA (driver):** **12.9**
+- **PyTorch:** **2.8.0+cu129**
+- **CUDA available:** ✅
+
+---
+
+## 📊 Training Logs & Metrics
+
+- **Total FLOPs (training):** `7,703,275,221,221,900,000`
+- **Training runtime:** `3,446.3047` seconds
+- **Logging:** TensorBoard-compatible logs in `src/logs/training-logs/`
+
+You can monitor training live with:
+
+```bash
+tensorboard --logdir src/logs/training-logs
+```
+
+### 📉 Loss Curve
+
+The following plot shows the training loss progression:
+
+![Training Loss Curve](assets/train_loss.svg)
+
+*(SVG file generated during training and stored under `assets/`)*
 ## Inference 
 ```bash
 python -m src.infer \

@@ -1,4 +1,13 @@
 # hf-kws — Keyword Spotting with Hugging Face + PyTorch
+> A compact, end‑to‑end pipeline for training, evaluating, and deploying a Wav2Vec2‑based keyword‑spotting (KWS) model. Includes realtime/streaming inference and one‑click AWS SageMaker deployment.
+## Highlights
+- **Train** a Hugging Face audio classifier (e.g., `facebook/wav2vec2-base`) for keyword spotting on **Speech Commands v2**.
+- **Evaluate** with saved JSON metrics (train/val/test) and visualize **loss/F1** curves from `assets/`.
+- **Infer** on single files or **stream from microphone**.
+- **(Optional)** **Export to ONNX**.
+- **Deploy** to **AWS SageMaker** (realtime, *serverless*, batch transform) + a small client to invoke the endpoint.
+- **CI**: Ruff lint + PyTest, optional pipeline trigger.
+## Repository Layout
 ```
 hf-kws/
 ├── README.md

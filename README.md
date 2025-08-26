@@ -7,6 +7,16 @@
 - **(Optional)** **Export to ONNX**.
 - **Deploy** to **AWS SageMaker** (realtime, *serverless*, batch transform) + a small client to invoke the endpoint.
 - **CI**: Ruff lint + PyTest, optional pipeline trigger.
+## 🚀 Model on Hugging Face
+
+[![Hugging Face](https://img.shields.io/badge/🤗%20Hugging%20Face-Keyword--Spotting-yellow.svg)](https://huggingface.co/Amirhossein75/Keyword-Spotting)
+
+<p align="center">
+  <a href="https://huggingface.co/Amirhossein75/Keyword-Spotting">
+    <img src="https://img.shields.io/badge/🤗%20View%20on%20Hugging%20Face-blueviolet?style=for-the-badge" alt="Hugging Face Repo">
+  </a>
+</p>
+
 ## Repository Layout
 ```
 hf-kws/
@@ -43,15 +53,7 @@ hf-kws/
 This project fine-tunes a Wav2Vec2 audio classifier for **keyword spotting** on the
 open-source **Speech Commands v2** dataset, then runs both offline and realtime streaming inference.
 
-## 🚀 Model on Hugging Face
 
-[![Hugging Face](https://img.shields.io/badge/🤗%20Hugging%20Face-Keyword--Spotting-yellow.svg)](https://huggingface.co/Amirhossein75/Keyword-Spotting)
-
-<p align="center">
-  <a href="https://huggingface.co/Amirhossein75/Keyword-Spotting">
-    <img src="https://img.shields.io/badge/🤗%20View%20on%20Hugging%20Face-blueviolet?style=for-the-badge" alt="Hugging Face Repo">
-  </a>
-</p>
 
 ## Features
 - ✅ Fine-tune `Wav2Vec2` (or any HF audio classifier) with 🤗 `Trainer`

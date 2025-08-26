@@ -45,7 +45,7 @@ open-source **Speech Commands v2** dataset, then runs both offline and realtime 
 
 ## 🚀 Model on Hugging Face
 
-[![Hugging Face](https://img.shields.io/badge/🤗%20Hugging%20Face-Keyword--Spottin-yellow.svg)](https://huggingface.co/Amirhossein75/Keyword-Spotting)
+[![Hugging Face](https://img.shields.io/badge/🤗%20Hugging%20Face-Keyword--Spotting-yellow.svg)](https://huggingface.co/Amirhossein75/Keyword-Spotting)
 
 <p align="center">
   <a href="https://huggingface.co/Amirhossein75/Keyword-Spotting">

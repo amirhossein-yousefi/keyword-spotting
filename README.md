@@ -92,6 +92,60 @@ python train.py \
 ```
 By default, the script uses the speech_commands dataset.
 
+## ⚙️ Training & Data Hyperparameters (KWS with HF Transformers)
+
+| **Category**                   | **Parameter**                 | **Source / Key**                  | **Default / Example**          | **Description**                                               |
+| ------------------------------ | ----------------------------- | --------------------------------- | ------------------------------ | ------------------------------------------------------------- |
+| **Config I/O**                 | `config`                      | CLI                               | `../configs/train_config.yaml` | YAML file with all training config                            |
+|                                | `output_dir`                  | CLI                               | `./runs/wav2vec2-kws`          | Checkpoints, logs, and metrics path                           |
+| **CLI overrides → cfg**        | `learning_rate`               | CLI→cfg                           | `None`                         | If provided, overrides `cfg.learning_rate`                    |
+|                                | `num_train_epochs`            | CLI→cfg                           | `None`                         | Overrides `cfg.num_train_epochs`                              |
+|                                | `train_batch_size`            | CLI→cfg                           | `None`                         | Overrides `cfg.train_batch_size`                              |
+|                                | `eval_batch_size`             | CLI→cfg                           | `None`                         | Overrides `cfg.eval_batch_size`                               |
+|                                | `model_name_or_path`          | CLI→cfg                           | `None`                         | Overrides `cfg.model_name_or_path`                            |
+| **Randomness**                 | `seed`                        | `cfg.seed`                        | *(from YAML)*                  | Set with `set_seed(cfg["seed"])`                              |
+| **Dataset**                    | `dataset_name`                | `cfg.dataset_name`                | *(from YAML)*                  | e.g., `speech_commands`                                       |
+|                                | `dataset_config`              | `cfg.dataset_config`              | *(from YAML)*                  | Subset/version of dataset                                     |
+|                                | `sample_rate`                 | `cfg.sample_rate`                 | *(from YAML)*                  | Target sampling rate                                          |
+|                                | `subset_fraction`             | `cfg.subset_fraction`             | `1.0`                          | Downsample dataset fraction                                   |
+| **Preprocessing**              | Feature extractor             | `cfg.model_name_or_path`          | *(from YAML)*                  | Built via `build_feature_extractor`                           |
+|                                | `max_duration_seconds`        | `cfg.max_duration_seconds`        | *(from YAML)*                  | Trim/pad window per clip                                      |
+|                                | `augment.enabled`             | `cfg.augment.enabled`             | `False`                        | Train-time augmentation toggle                                |
+| **Labels**                     | `label2id` / `id2label`       | derived                           | —                              | Built from dataset via `label_maps`                           |
+| **Model**                      | `model_name_or_path`          | `cfg.model_name_or_path`          | *(from YAML)*                  | HF audio classifier backbone (e.g., `facebook/wav2vec2-base`) |
+|                                | `num_labels`                  | derived                           | —                              | `len(labels)` from dataset                                    |
+|                                | `problem_type`                | fixed                             | `single_label_classification`  |                                                               |
+| **Optimization**               | `learning_rate`               | `cfg.learning_rate`               | *(from YAML/override)*         | AdamW LR (HF Trainer default optimizer)                       |
+|                                | `weight_decay`                | `cfg.weight_decay`                | *(from YAML)*                  | L2 regularization                                             |
+|                                | `num_train_epochs`            | `cfg.num_train_epochs`            | *(from YAML/override)*         | Epoch budget                                                  |
+|                                | `gradient_accumulation_steps` | `cfg.gradient_accumulation_steps` | *(from YAML)*                  | Accumulate gradients N steps                                  |
+|                                | `lr_scheduler_type`           | `cfg.lr_scheduler_type`           | *(from YAML)*                  | e.g., `linear`, `cosine`                                      |
+|                                | `warmup_ratio`                | `cfg.warmup_ratio`                | *(from YAML)*                  | Warmup fraction of total steps                                |
+|                                | `max_grad_norm`               | `cfg.max_grad_norm`               | `1.0`                          | Gradient clipping                                             |
+| **Batching**                   | `per_device_train_batch_size` | `cfg.train_batch_size`            | *(from YAML/override)*         | Per-GPU train batch size                                      |
+|                                | `per_device_eval_batch_size`  | `cfg.eval_batch_size`             | *(from YAML/override)*         | Per-GPU eval batch size                                       |
+| **Precision**                  | `fp16`                        | `cfg.fp16`                        | `False`                        | Mixed precision (if GPU supports)                             |
+| **Evaluation & Checkpointing** | `evaluation_strategy`         | `cfg.evaluation_strategy`         | *(from YAML)*                  | e.g., `steps` or `epoch`                                      |
+|                                | `eval_steps`                  | `cfg.eval_steps`                  | *(from YAML)*                  | Step interval for eval                                        |
+|                                | `save_strategy`               | fixed                             | `steps`                        | Always save by steps                                          |
+|                                | `save_steps`                  | `cfg.save_steps`                  | *(from YAML)*                  | Step interval for checkpoints                                 |
+|                                | `save_total_limit`            | `cfg.save_total_limit`            | *(from YAML)*                  | Keep last N checkpoints                                       |
+|                                | `load_best_model_at_end`      | `cfg.load_best_model_at_end`      | *(from YAML)*                  | Restore best checkpoint                                       |
+|                                | `metric_for_best_model`       | `cfg.metric_for_best_model`       | *(from YAML)*                  | e.g., `eval_f1_weighted`                                      |
+|                                | `greater_is_better`           | `cfg.greater_is_better`           | *(from YAML)*                  | True/False based on metric                                    |
+|                                | `EarlyStoppingCallback`       | fixed                             | `patience=5`                   | Stop if no improvement                                        |
+| **Logging**                    | `logging_steps`               | `cfg.logging_steps`               | *(from YAML)*                  | TB log frequency                                              |
+|                                | `report_to`                   | fixed                             | `["tensorboard"]`              | Logging backend                                               |
+|                                | `logging_dir`                 | fixed                             | `logs/training-logs`           | TensorBoard log dir                                           |
+| **Dataloader**                 | `dataloader_num_workers`      | OS-aware                          | `0` on Windows, else `4`       | Worker threads per DataLoader                                 |
+|                                | `dataloader_pin_memory`       | fixed                             | `False`                        | Pin memory disabled                                           |
+| **Collation**                  | `data_collator`               | built                             | —                              | From `build_data_collator(fe)`                                |
+| **Metrics**                    | `accuracy`                    | evaluate                          | —                              | `accuracy`                                                    |
+|                                | `f1_weighted`                 | evaluate                          | —                              | `f1(average="weighted")`                                      |
+|                                | `precision_weighted`          | evaluate                          | —                              | `precision(average="weighted")`                               |
+|                                | `recall_weighted`             | evaluate                          | —                              | `recall(average="weighted")`                                  |
+| **Push to Hub**                | `push_to_hub`                 | `cfg.push_to_hub`                 | `False`                        | HF Hub integration toggle                                     |
+
 
 ## 🖥️ Training Hardware & Environment
 
